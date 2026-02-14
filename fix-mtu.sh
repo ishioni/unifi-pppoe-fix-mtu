@@ -17,11 +17,11 @@ fi
 
 INTERFACE_MTU=$(cat "$MTUPATH")
 
-if [ "$INTERFACE_MTU" -eq 1492 ]; then
+if [ "$INTERFACE_MTU" -ne $MTU ]; then
   echo "MTU for ${PPP_INTERFACE} is $INTERFACE_MTU, changing to $MTU"
-  sed -i 's/ 1492/ ${MTU}/g' "/etc/ppp/peers/${PPP_INTERFACE}"
-  ip link set dev ${WAN_INTERFACE} mtu 1508
-  ip link set dev ${VLAN_INTERFACE} mtu 1508
+  sed -i "s/ 1492/ ${MTU}/g" "/etc/ppp/peers/${PPP_INTERFACE}"
+  ip link set dev ${WAN_INTERFACE} mtu $(( MTU + 8 ))
+  ip link set dev ${WAN_INTERFACE}.${VLAN_INTERFACE} mtu $(( MTU + 8 ))
   ifconfig ${WAN_INTERFACE} down
   ifconfig ${WAN_INTERFACE} up
   killall pppd

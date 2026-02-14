@@ -23,7 +23,7 @@ curl -sL https://raw.githubusercontent.com/ishioni/unifi-pppoe-fix-mtu/main/inst
 **After installation:**
 1.  Check the configuration in `/data/fix-mtu/fix-mtu.conf`.
     ```bash
-    vi /data/fix-mtu/fix-mtu.conf
+    nano /data/fix-mtu/fix-mtu.conf
     ```
     *   Update `WAN_INTERFACE` (e.g., `eth8` or `eth4`) and `VLAN_ID` (e.g., `35`) if needed.
     *   `PPP_INTERFACE` defaults to `ppp0`.
@@ -64,6 +64,7 @@ If you prefer to install manually:
     WAN_INTERFACE=eth8
     VLAN_ID=35
     VLAN_INTERFACE=${WAN_INTERFACE}.${VLAN_ID}
+    MTU=1500
     ```
     Adjust the values to match your setup.
 

@@ -82,8 +82,8 @@ if ! [ -d $INSTALL_DIR ]; then
   fi
 fi
 
-# Backup existing script (just in case)
-if [ -f "$OLD_SCRIPT" ]; then
+# Config file not present, preserve old values
+if [[ -f "$OLD_SCRIPT" && ! -f "$CONF_FILE" ]]; then
     mv "$OLD_SCRIPT" "$OLD_SCRIPT.old"
 fi
 
