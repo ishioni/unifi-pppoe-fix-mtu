@@ -4,7 +4,9 @@ After=network.target
 Wants=network.target
 
 [Service]
-ExecStart=/bin/bash cd /data/fix-mtu;chmod +x *mtu*;/bin/bash /data/fix-mtu/monitor-mtu.sh
+WorkingDirectory=/data/fix-mtu
+ExecStartPre=/bin/bash -c 'chmod +x /data/fix-mtu/*.sh'
+ExecStart=/bin/bash /data/fix-mtu/monitor-mtu.sh
 Restart=always
 RestartSec=2
 StandardOutput=journal

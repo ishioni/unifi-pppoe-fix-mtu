@@ -1,20 +1,33 @@
 #!/bin/bash
+
+# Source configuration
+if [ -f "fix-mtu.conf" ]; then
+  source fix-mtu.conf
+else
+  echo "Config file not found, exiting"
+  exit 1
+fi
+
 attempt=1
-while [ ! -f /sys/class/net/ppp0/mtu ];
+MTUPATH="/sys/class/net/${PPP_INTERFACE}/mtu"
+
+while [ ! -f "${MTUPATH}" ];
 do
-	echo "ppp0 device not ready - attempt #$attempt"
+	echo "${PPP_INTERFACE} device not ready - attempt #$attempt"
 	(( attempt++ ))
 	sleep 15
 done
-MTU=$(cat /sys/class/net/ppp0/mtu)
-echo "MTU for ppp0 on startup is $MTU"
-if [ "$MTU" -eq 1492 ]; then
-	/data/fix-mtu/fix-mtu.sh 
+
+INTERFACE_MTU=$(cat "$MTUPATH")
+echo "MTU for ${PPP_INTERFACE} on startup is ${INTERFACE_MTU}"
+
+if [ "${INTERFACE_MTU}" -neq ${MTU} ]; then
+	/data/fix-mtu/fix-mtu.sh
 else
 	ip monitor link | while read -r line; do
-	  if [[ "$line" == *"ppp0"* && "$line" == *"mtu"* ]]; then
-		echo "MTU change detected on ppp0: $line"
-		/data/fix-mtu/fix-mtu.sh 
+	  if [[ "$line" == *"${PPP_INTERFACE}"* && "$line" == *"mtu"* ]]; then
+  		echo "MTU change detected on ${PPP_INTERFACE}: $line"
+  		/data/fix-mtu/fix-mtu.sh
 	  fi
 	done
 fi

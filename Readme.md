@@ -12,6 +12,30 @@ By default, Unifi OS often limits PPPoE connections to an MTU of 1492. This scri
 
 ## Installation
 
+### Quick Install (Recommended)
+
+Run the following command on your Unifi Gateway to download and install the scripts automatically:
+
+```bash
+curl -sL https://raw.githubusercontent.com/ishioni/unifi-pppoe-fix-mtu/main/install.sh | bash
+```
+
+**After installation:**
+1.  Check the configuration in `/data/fix-mtu/fix-mtu.conf`.
+    ```bash
+    vi /data/fix-mtu/fix-mtu.conf
+    ```
+    *   Update `WAN_INTERFACE` (e.g., `eth8` or `eth4`) and `VLAN_ID` (e.g., `35`) if needed.
+    *   `PPP_INTERFACE` defaults to `ppp0`.
+2.  Restart the service to apply changes:
+    ```bash
+    systemctl restart fix-mtu
+    ```
+
+### Manual Installation
+
+If you prefer to install manually:
+
 1.  **SSH into your Unifi Gateway:**
     ```bash
     ssh root@<your-gateway-ip>
@@ -30,12 +54,18 @@ By default, Unifi OS often limits PPPoE connections to an MTU of 1492. This scri
     ```
 
 4.  **Configure the script:**
-    Edit `/data/fix-mtu/fix-mtu.sh` to match your WAN interface and VLAN ID.
+    Create a configuration file `/data/fix-mtu/fix-mtu.conf`:
     ```bash
-    vi /data/fix-mtu/fix-mtu.sh
+    vi /data/fix-mtu/fix-mtu.conf
     ```
-    *   Update `IFACE` (e.g., `eth8` or `eth4` depending on your model and WAN port).
-    *   Update `VLAN` (e.g., `35` if your ISP uses VLAN 35).
+    Content:
+    ```bash
+    PPP_INTERFACE=ppp0
+    WAN_INTERFACE=eth8
+    VLAN_ID=35
+    VLAN_INTERFACE=${WAN_INTERFACE}.${VLAN_ID}
+    ```
+    Adjust the values to match your setup.
 
 5.  **Make scripts executable:**
     ```bash

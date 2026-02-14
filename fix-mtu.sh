@@ -1,19 +1,29 @@
 #!/bin/bash
-IFACE=eth6
-VLAN=35
-MTUPATH=/sys/class/net/ppp0/mtu
-MTU=$(cat /sys/class/net/ppp0/mtu)
-if ! [ -f $MTUPATH ]; then 
-  echo "PPP0 device not ready"
+
+# Source configuration
+if [ -f "fix-mtu.conf" ]; then
+    source fix-mtu.conf
+else
+  echo "Config file not found, exiting"
+  exit 1
+fi
+
+MTUPATH="/sys/class/net/${PPP_INTERFACE}/mtu"
+
+if ! [ -f "$MTUPATH" ]; then
+  echo "${PPP_INTERFACE} device not ready"
   exit 0
 fi
-if [ "$MTU" -eq 1492 ]; then
-  echo "MTU for ppp0 is $MTU, changing to 1500"
-  sed -i 's/ 1492/ 1500/g' /etc/ppp/peers/ppp0
-  ip link set dev ${IFACE} mtu 1508
-  ip link set dev ${IFACE}.${VLAN} mtu 1508
-  ifconfig ${IFACE} down
-  ifconfig ${IFACE} up
+
+INTERFACE_MTU=$(cat "$MTUPATH")
+
+if [ "$INTERFACE_MTU" -eq 1492 ]; then
+  echo "MTU for ${PPP_INTERFACE} is $INTERFACE_MTU, changing to $MTU"
+  sed -i 's/ 1492/ ${MTU}/g' "/etc/ppp/peers/${PPP_INTERFACE}"
+  ip link set dev ${WAN_INTERFACE} mtu 1508
+  ip link set dev ${VLAN_INTERFACE} mtu 1508
+  ifconfig ${WAN_INTERFACE} down
+  ifconfig ${WAN_INTERFACE} up
   killall pppd
   sleep 1
   killall -HUP dnscrypt-proxy dnsmasq
