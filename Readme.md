@@ -1,20 +1,20 @@
-# Unifi UDM Pro/SE PPPoE MTU Fix
+# Unifi (Cloud) Gateways PPPoE MTU Fix
 
-This repository contains a set of scripts to enable full RFC4638 support (1500 byte MTU) on Ubiquiti Unifi Dream Machine (UDM) Pro and SE gateways when using PPPoE connections.
+This repository contains a set of scripts to enable full RFC4638 support (1500 byte MTU) on Ubiquiti Unifi (Cloud) Gateways running UnifiOS (such as UDM Pro, UDM SE, UDW, UDR, UXG, etc.) when using PPPoE connections.
 
 By default, Unifi OS often limits PPPoE connections to an MTU of 1492. This script forces the correct interface settings to allow a full 1500 byte payload, improving network performance and reducing fragmentation.
 
 ## Prerequisites
 
-*   Unifi UDM Pro or UDM SE.
+*   Unifi Gateway running UnifiOS (UDM Pro/SE, UDW, UDR, etc.).
 *   SSH access enabled on the device.
 *   A PPPoE internet connection (optionally on a VLAN).
 
 ## Installation
 
-1.  **SSH into your UDM:**
+1.  **SSH into your Unifi Gateway:**
     ```bash
-    ssh root@<your-udm-ip>
+    ssh root@<your-gateway-ip>
     ```
 
 2.  **Prepare the directory:**
@@ -24,9 +24,9 @@ By default, Unifi OS often limits PPPoE connections to an MTU of 1492. This scri
     ```
 
 3.  **Copy files:**
-    Upload `fix-mtu.sh`, `monitor-mtu.sh`, and `fix-mtu.service` to `/data/fix-mtu/` on your UDM. You can use `scp` from your local machine:
+    Upload `fix-mtu.sh`, `monitor-mtu.sh`, and `fix-mtu.service` to `/data/fix-mtu/` on your Gateway. You can use `scp` from your local machine:
     ```bash
-    scp *mtu* root@<your-udm-ip>:/data/fix-mtu/
+    scp *mtu* root@<your-gateway-ip>:/data/fix-mtu/
     ```
 
 4.  **Configure the script:**
@@ -34,7 +34,7 @@ By default, Unifi OS often limits PPPoE connections to an MTU of 1492. This scri
     ```bash
     vi /data/fix-mtu/fix-mtu.sh
     ```
-    *   Update `IFACE` (e.g., `eth8` for WAN1 on UDM Pro, `eth9` for WAN2/SFP+).
+    *   Update `IFACE` (e.g., `eth8` or `eth4` depending on your model and WAN port).
     *   Update `VLAN` (e.g., `35` if your ISP uses VLAN 35).
 
 5.  **Make scripts executable:**
@@ -55,7 +55,7 @@ By default, Unifi OS often limits PPPoE connections to an MTU of 1492. This scri
 
 **Disable MSS Clamping:**
 For this fix to work correctly, you must disable MSS Clamping in the Unifi Network application.
-1.  Go to **Devices** and select your Gateway (UDM).
+1.  Go to **Devices** and select your Gateway.
 2.  Go to **Settings** (Config) -> **Advanced**.
 3.  Ensure **MSS Clamping** is set to **Auto** or **Disabled** (or Custom with a high value, but Disabled is preferred if the MTU fix works). *Note: The original advice suggests disabling it to let the proper MTU negotiation handle packet sizes.*
 
