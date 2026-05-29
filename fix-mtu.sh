@@ -29,7 +29,7 @@ if [ "$INTERFACE_MTU" -ne $MTU ]; then
   # ifconfig ${WAN_INTERFACE} up
   killall pppd
   sleep 1
-  killall -HUP dnscrypt-proxy dnsmasq
+  killall -q -HUP dnsmasq dnscrypt-proxy || :
 else
   echo "MTU is OK"
 fi
