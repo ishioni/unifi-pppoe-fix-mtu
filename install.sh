@@ -103,6 +103,15 @@ chmod +x "$INSTALL_DIR/"*.sh
 log_info "Installing service..."
 cp "$INSTALL_DIR/fix-mtu.service" "$SERVICE_DEST"
 systemctl daemon-reload
+
 echo "Start with systemctl start fix-mtu.service"
 echo "Enable on boot with systemctl enable fix-mtu.service"
+
+model=$(ubnt-device-info model 2>/dev/null || :)
+
+case "$model" in
+  "UniFi Gateway Fiber" | "UniFi Cloud Gateway Fiber" )
+    echo && log_warn "Your $model only supports changing the MTU for ports 5, 6, and 7." && echo ;;
+esac
+
 log_info "Installation complete!"
