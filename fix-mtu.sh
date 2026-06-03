@@ -17,19 +17,32 @@ fi
 
 INTERFACE_MTU=$(cat "$MTUPATH")
 
-if [ "$INTERFACE_MTU" -ne $MTU ]; then
-  echo "MTU for ${PPP_INTERFACE} is $INTERFACE_MTU, changing to $MTU"
-  sed -i "s/ ${INTERFACE_MTU}/ ${MTU}/g" "/etc/ppp/peers/${PPP_INTERFACE}"
-  ip link set dev ${WAN_INTERFACE} mtu $(( MTU + 8 ))
-  if [ -n "$VLAN_ID" ]; then
-    ip link set dev ${WAN_INTERFACE}.${VLAN_ID} mtu $(( MTU + 8 ))
-  fi
-  # This might not even be needed?
-  # ifconfig ${WAN_INTERFACE} down
-  # ifconfig ${WAN_INTERFACE} up
-  killall pppd
-  sleep 1
-  killall -q -HUP dnsmasq dnscrypt-proxy || :
-else
+if [ "$INTERFACE_MTU" -eq $MTU ]; then
   echo "MTU is OK"
+  exit 0
 fi
+
+model=$(ubnt-device-info model 2>/dev/null || :)
+
+case "$model" in
+  "UniFi Gateway Fiber" | "UniFi Cloud Gateway Fiber" )
+    case "${WAN_INTERFACE,,}" in
+      "eth0" | "eth1" | "eth2" | "eth3")
+        echo "ERROR: Your $model only supports changing the MTU for ports 5, 6, and 7."
+        exit 1 ;;
+    esac
+esac
+
+echo "MTU for ${PPP_INTERFACE} is $INTERFACE_MTU, changing to $MTU"
+
+sed -i "s/ ${INTERFACE_MTU}/ ${MTU}/g" "/etc/ppp/peers/${PPP_INTERFACE}"
+ip link set dev ${WAN_INTERFACE} mtu $(( MTU + 8 ))
+if [ -n "$VLAN_ID" ]; then
+  ip link set dev ${WAN_INTERFACE}.${VLAN_ID} mtu $(( MTU + 8 ))
+fi
+
+killall pppd
+sleep 1
+killall -q -HUP dnsmasq dnscrypt-proxy || :
+
+exit 0
