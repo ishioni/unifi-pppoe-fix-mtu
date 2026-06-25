@@ -64,17 +64,15 @@ fi
 
 # 2. Extract
 log_info "Extracting..."
-tar -xzf "$TAR_FILE" --strip-components=1 -C "$TEMP_DIR"
-if [ $? -ne 0 ]; then
+if ! tar -xzf "$TAR_FILE" --strip-components=1 -C "$TEMP_DIR"; then
     log_error "Extraction failed."
     exit 1
 fi
 
 # 3. Install Files
 log_info "Installing to $INSTALL_DIR..."
-if ! [ -d $INSTALL_DIR ]; then
-  mkdir -p "$INSTALL_DIR"
-  if [ $? -ne 0 ]; then
+if [ ! -d "$INSTALL_DIR" ]; then
+  if ! mkdir -p "$INSTALL_DIR"; then
       log_error "$INSTALL_DIR creation failed."
       exit 1
   fi
@@ -86,7 +84,7 @@ if [[ -f "$OLD_SCRIPT" && ! -f "$CONF_FILE" ]]; then
 fi
 
 cp "${TEMP_DIR}"/*.{sh,service} "${INSTALL_DIR}/"
-if ! [ -f ${CONF_FILE} ]; then
+if [ ! -f "$CONF_FILE" ]; then
   cp "${TEMP_DIR}"/*.conf "${INSTALL_DIR}/"
   echo ""
   echo "IMPORTANT:"

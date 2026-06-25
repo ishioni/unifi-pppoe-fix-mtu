@@ -2,6 +2,7 @@
 
 # Source configuration
 if [ -f "fix-mtu.conf" ]; then
+  # shellcheck disable=SC1091
   source fix-mtu.conf
 else
   echo "Config file not found, exiting"
@@ -21,7 +22,7 @@ done
 INTERFACE_MTU=$(cat "$MTUPATH")
 echo "MTU for ${PPP_INTERFACE} on startup is ${INTERFACE_MTU}"
 
-if [ "${INTERFACE_MTU}" -ne ${MTU} ]; then
+if [ "${INTERFACE_MTU}" -ne "${MTU}" ]; then
 	/data/fix-mtu/fix-mtu.sh
 else
 	ip monitor link | while read -r line; do
