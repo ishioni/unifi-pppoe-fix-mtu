@@ -189,7 +189,7 @@ For the legacy workaround to behave correctly, MSS Clamping should not fight the
 
 1. Go to **Devices** and select your gateway.
 2. Go to **Settings** / **Config** -> **Advanced**.
-3. Ensure **MSS Clamping** is set to **Auto** or **Disabled**.
+3. Ensure **MSS Clamping** is set to **Disabled**.
 
 If UniFi `10.5+` handles RFC4638 natively in your environment, prefer the upstream defaults and test before keeping any old manual tuning.
 
